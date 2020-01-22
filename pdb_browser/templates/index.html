@@ -2,11 +2,11 @@
 
 {% block content %}
 
-<form name="MainForm" action="/search" method="POST" enctype="multipart/form-data">
+<form name="MainForm" action="/search/" method="POST" enctype="multipart/form-data">
     <div class="row" style="border-bottom: solid 1px">
         <div class="form-group">
             <label><b>PDB Id</b></label>
-            <input type="text" name="idCode" value="{{queryData.idCode}}" size="5" maxlength="4"/>
+            <input type="text" name="idCode" value="{{query_data.idCode}}" size="5" maxlength="4"/>
         </div>
     </div>
     <div class="row">
@@ -17,8 +17,8 @@
             <div class="form-group">
                 <label>Resolution</label>
                 <p>                    
-                    From <input type="text" name="minRes" value="{{queryData.minRes}}" size="5">
-                    to <input type="text" name="maxRes" value="{{queryData.maxRes}}" size="5" >
+                    From <input type="text" name="minRes" value="{{query_data.minRes}}" size="5">
+                    to <input type="text" name="maxRes" value="{{query_data.maxRes}}" size="5" >
                 </p>
             </div>
 
@@ -54,7 +54,7 @@
         <div class="col-md-6">
             <label><h4> Text Search</h4></label>
             <div class="form-group">
-                <input type="text" name="query" value="{{queryData.query}}" style="width:100%" />
+                <input type="text" name="query" value="{{query_data.query}}" style="width:100%" />
             </div>
         </div>
     </div>
