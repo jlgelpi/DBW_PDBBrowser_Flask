@@ -45,7 +45,7 @@ def create_app(test_config=None):
     def index():
         glob_vars = globals()
         if 'query_data' not in session:
-            queryData = {
+            query_data = {
                 'minRes' : '0.0',
                 'maxRes' : 'Inf',
                 'query' : ''

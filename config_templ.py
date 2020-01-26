@@ -1,7 +1,7 @@
 SECRET_KEY = 'dev'
 MYSQL_HOST = 'localhost'
-MYSQL_USER = USER 
-MYSQL_PASSWORD = PASS'
+MYSQL_USER = 'USER' 
+MYSQL_PASSWORD = 'PASS'
 MYSQL_DB = 'pdb'
 BLAST_HOME = '../../blast'
 BLAST_DBDIR = BLAST_HOME + '/DBS'
@@ -9,3 +9,4 @@ BLAST_DBS = {'SwissProt': 'sprot', 'PDB': 'pdb'}
 BLAST_EXE = BLAST_HOME + '/bin/blastp'
 BLAST_CMDLINE = BLAST_EXE + ' -db ' + BLAST_DBDIR + '/' + BLAST_DBS['PDB'] + ' -evalue 0.001 -max_target_seqs 100 -outfmt "6 sseqid stitle evalue" '
 TEXT_FIELDS = ['e.header', 'e.compound', 'a.author', 's.source', 'sq.header']
+TITLE = 'TITLE'
