@@ -35,7 +35,7 @@
             </tr>
             <tr>
                 <td>Experiment type</td> 
-                <td colspan="2">{{ globals['expTypeArray'][data['idExpType']]['ExpType'] }}</td>
+                <td colspan="2">{{ globals['expTypeArray'][data['idExpType']] }}</td>
             </tr>
             <tr>
                 <td>Authors</td>
@@ -52,7 +52,9 @@
             <tr>
                 <td>Sequence(s)</td>
                 <td colspan="2">
-                    {{ data['sequences'] }}
+                    {% for sq in data['sequences'] %}
+                    <p><pre>{{ sq }}</pre></p>
+                    {% endfor %}
                 </td>
             </tr>
         </tbody>

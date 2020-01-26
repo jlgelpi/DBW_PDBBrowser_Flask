@@ -9,4 +9,4 @@ BLAST_DBS = {'SwissProt': 'sprot', 'PDB': 'pdb'}
 BLAST_EXE = BLAST_HOME + '/bin/blastp'
 BLAST_CMDLINE = BLAST_EXE + ' -db ' + BLAST_DBDIR + '/' + BLAST_DBS['PDB'] + ' -evalue 0.001 -max_target_seqs 100 -outfmt "6 sseqid stitle evalue" '
 TEXT_FIELDS = ['e.header', 'e.compound', 'a.author', 's.source', 'sq.header']
-TITLE = 'TITLE'
+TITLE='Some general title'
