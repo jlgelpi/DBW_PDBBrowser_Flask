@@ -1,8 +1,12 @@
 import os
 import sys
+import re
 
 from flask import Flask, render_template, session, request, url_for, redirect
 from flask_mysqldb import MySQL
+
+def prep_fasta(seq, header):
+    return ">{}\n{}".format(header, re.sub('.{60}','\g<0>\n',seq))
 
 def create_app(test_config=None):
     # create and configure the app
@@ -92,10 +96,8 @@ def create_app(test_config=None):
         rs = cur.execute("SELECT * from sequence s where s.idCode='{}' order by s.chain".format(idCode))
         data['sequences'] = []
         for sq in cur.fetchall():
-            fasta = ">{}\n{}".format(sq[3], sq[2])
-            data['sequences'].append(fasta)
-        
-        print(data)
+            data['sequences'].append(prep_fasta(sq[2], sq[3]))
+
         return render_template(
             'show.html',
             title=app.config['TITLE'] + " - " + idCode,
@@ -106,3 +108,5 @@ def create_app(test_config=None):
     
     
     return app
+
+  
