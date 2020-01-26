@@ -1,4 +1,4 @@
 nb-configuration.xml
 nbproject/
-__pycache__
+__pycache__/
 *.pyc

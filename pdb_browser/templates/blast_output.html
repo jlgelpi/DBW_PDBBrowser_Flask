@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<p>Num Hits: {{ count }}</p>
+    <table border="0" cellspacing="2" cellpadding="4" id="blastTable">
+        <thead>
+            <tr>
+                <th>idCode</th>
+                <th>Type</th>
+                <th>Header</th>
+                <th>E. value</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for data in results %}
+                <tr>
+                    <td>
+                        <a href="/show/{{data['idCode']}}">{{ data['idCode'] }}_{{ data['sub']}}</a>
+                    </td>
+                    <td>{{data['tip']}}</td>	
+                    <td>{{data['desc']}}</td>
+                    <td>{{data['ev']}}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+<p class="button"><a href="/?new=1">New Search</a></p>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#blastTable').DataTable();
+    });
+</script>
+
+{% endblock %}
