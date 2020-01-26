@@ -47,7 +47,7 @@ def create_app(test_config=None):
 # Index 
 #
 
-    @app.route('/')
+    @app.route(app.config['BASE_URL'])
     def index():
         glob_vars = globals()
         if 'query_data' not in session:
@@ -63,34 +63,39 @@ def create_app(test_config=None):
             'index.html', 
             title=app.config['TITLE'],
             query_data=query_data,
-            compTypeArray=glob_vars['compTypeArray'],
-            expClasseArray=glob_vars['expClasseArray']
+            globals=glob_vars
         )
 #
 # Search page
 #
-    @app.route('/search/', methods=['GET', 'POST'])
+    @app.route(app.config['BASE_URL'] + 'search/', methods=['GET', 'POST'])
     def search():
         session['query_data'] = request.form
-        #PDB ID 
         if request.form['idCode']:
+            #PDB ID 
             return redirect(url_for('show', idCode=request.form['idCode']))
-        elif request.form['seqQuery'] or 'seqFile' in request.files:
+        elif request.form['seqQuery'] or 'filename' in request.files['seqFile']:
             if request.files['seqFile'].filename:
                 sequence = request.files['seqFile'].read().decode('ascii')
             else:
                 sequence = request.form['seqQuery']
-        # Blast
-            session['query_seq'] = sequence
+            # Blast
+            if not sequence: 
+                return render_template(
+                    "error.html", 
+                    title=app.config['TITLE'] + " No input sequence found", 
+                    error_text='No input sequence found'
+                )
+            session['query_seq'] = sequence        
             return redirect(url_for('blast'))
         else:
-        # Search
+            # Search
             return request.form
 
 #
 # Blast
 #
-    @app.route('/blast/')
+    @app.route(app.config['BASE_URL'] + 'blast/')
     def blast():
         query = session['query_seq']
         if query[0] != '>': # Assumed not fasta
@@ -127,7 +132,7 @@ def create_app(test_config=None):
             return render_template(
                 "error.html", 
                 title=app.config['TITLE'] + " No Blast results found", 
-                error_text='No results found. <p class="button" ><a href=\"\?new=1\">New Search</a></p>'
+                error_text='No results found'
             )
         
         os.remove(query_fasta_file)
@@ -143,7 +148,7 @@ def create_app(test_config=None):
 #   
 # Show Structure
 #
-    @app.route('/show/<idCode>')
+    @app.route(app.config['BASE_URL'] + 'show/<idCode>')
     def show(idCode):
         glob_vars = globals()
         cur = mysql.connection.cursor()

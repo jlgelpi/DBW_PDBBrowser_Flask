@@ -1,9 +1,10 @@
+BASE_URL = '/'
 SECRET_KEY = 'dev'
 MYSQL_HOST = 'localhost'
 MYSQL_USER = 'USER' 
 MYSQL_PASSWORD = 'PASS'
 MYSQL_DB = 'pdb'
-BLAST_HOME = '../../blast'
+BLAST_HOME = 'Blast application home dir'
 BLAST_DBDIR = BLAST_HOME + '/DBS'
 BLAST_DBS = {'SwissProt': 'sprot', 'PDB': 'pdb'}
 BLAST_EXE = BLAST_HOME + '/bin/blastp'
