@@ -1,5 +1,6 @@
 import os
 import sys
+import re
 
 from flask import Flask, render_template, session, request, url_for, redirect
 from flask_mysqldb import MySQL
@@ -45,7 +46,7 @@ def create_app(test_config=None):
     def index():
         glob_vars = globals()
         if 'query_data' not in session:
-            queryData = {
+            query_data = {
                 'minRes' : '0.0',
                 'maxRes' : 'Inf',
                 'query' : ''
@@ -69,11 +70,14 @@ def create_app(test_config=None):
         #PDB ID 
         if request.form['idCode']:
             return redirect(url_for('show', idCode=request.form['idCode']))
-        else:
-        # Blast
+        elif request.files['seqFile'] or 'seqQuery' in request.form:
+            if request.files['seqFile']:
+                session['query_data']['seqQuery']=request.files['seqFile'].read()
+            return redirect(url_for('blast'))
+                    
         # Search
         
-            return request.form
+        return request.form
 
 #
 # Show Structure
@@ -92,17 +96,20 @@ def create_app(test_config=None):
         rs = cur.execute("SELECT * from sequence s where s.idCode='{}' order by s.chain".format(idCode))
         data['sequences'] = []
         for sq in cur.fetchall():
-            fasta = ">{}\n{}".format(sq[3], sq[2])
+            seq = re.sub('(.{60})',"\g<1>"+"\n", sq[2])
+            fasta = ">{}\n{}".format(sq[3], seq)
             data['sequences'].append(fasta)
-        
         print(data)
+        
         return render_template(
             'show.html',
             title=app.config['TITLE'] + " - " + idCode,
             globals = glob_vars,
             data=data
         )
-    
-    
+
+    @app.route('/blast')
+    def blast():
+        return "Not yet"
     
     return app
