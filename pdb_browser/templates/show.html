@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 {% block content %}
-<table cellpadding="4" border="1">
+<table class="table">
     <tbody>
         <tr>
             <td>PDB reference</td>
             <td>{{data['idCode']}}</td>
             <td rowspan="5">
-                   <a href="http://www.pdb.org/pdb/explore.do?structureId={{data['idCode']}}">
+                   <a href="http://www.pdb.org/pdb/explore.do?structureId={{data['idCode']}}" target="_blank">
                         <img src="http://www.pdb.org/pdb/images/{{data['idCode'].lower()}}_bio_r_250.jpg" border="0" width="250" height="250"><br>
                         Link to Protein Data Bank</a>
                 </td>

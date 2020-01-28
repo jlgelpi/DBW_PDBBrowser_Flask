@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<p>Num Hits: {{ count }}</p>
+<table id="dataTable">
+    <thead>
+        <tr>
+            <th>idCode</th>
+            <th>Header</th>
+            <th>Compound</th>
+            <th>Resolution</th>
+            <th>Exp. Type</th>
+            <th>Source</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for data in results %}
+            <tr>
+                <td><a href="/show/{{ data['idCode'] }}">{{ data['idCode'] }}</a></td>
+                <td>{{ data['header'] }}</td>
+                <td>{{ data['compound']}}</td>
+                <td>{{ data['resolution']}}</td>
+                <td>{{ data['expType']}}</td>
+                <td>{{ data['source']}}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<p class="button"><a href="/?new=1">New Search</a></p>
+<script type="text/javascript">
+<!-- this activates the DataTable element when page is loaded-->
+    $(document).ready(function () {
+        $('#dataTable').DataTable();
+    });
+</script>
+
+{% endblock %}
