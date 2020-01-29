@@ -148,7 +148,8 @@ def create_app(test_config=None):
             'index.html', 
             title=app.config['TITLE'],
             query_data=query_data,
-            globals=glob_vars
+            globals=glob_vars,
+            base_url=app.config['BASE_URL']
         )
 #
 # Search page
@@ -185,7 +186,8 @@ def create_app(test_config=None):
                 return render_template(
                     "error.html", 
                     title=app.config['TITLE'] + " No results found", 
-                    error_text='No results found'
+                    error_text='No results found',
+                    base_url=app.config['BASE_URL']
                 )
             else:
                 for data in cur.fetchall():
@@ -204,7 +206,8 @@ def create_app(test_config=None):
                     'search_output.html',
                     title=app.config['TITLE'] + " - Blast search",
                     count=len(results),
-                    results=results
+                    results=results,
+                    base_url=app.config['BASE_URL']
                 )
         
 #
@@ -217,14 +220,16 @@ def create_app(test_config=None):
             return render_template(
                 "error.html", 
                 title=app.config['TITLE'] + " No Blast results found", 
-                error_text='No results found'
+                error_text='No results found',
+                base_url=app.config['BASE_URL']
             )
         else:
             return render_template(
                 'blast_output.html',
                 title=app.config['TITLE'] + " - Blast search",
                 count=len(results),
-                results=results
+                results=results,
+                base_url=app.config['BASE_URL']
             )
         
 #   
@@ -258,10 +263,6 @@ def create_app(test_config=None):
             globals = glob_vars,
             data=data
         )
-
-    @app.route('/blast')
-    def blast():
-        return "Not yet"
     
     return app
 
