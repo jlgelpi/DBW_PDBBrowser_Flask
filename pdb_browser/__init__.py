@@ -132,7 +132,7 @@ def create_app(test_config=None):
 # Index 
 #
 
-    @app.route(app.config['BASE_URL'])
+    @app.route(app.config['BASE_URL'] + '/')
     def index():
         glob_vars = get_globals()
         if 'query_data' not in session:
@@ -148,13 +148,12 @@ def create_app(test_config=None):
             'index.html', 
             title=app.config['TITLE'],
             query_data=query_data,
-            globals=glob_vars,
-            base_url=app.config['BASE_URL']
+            globals=glob_vars
         )
 #
 # Search page
 #
-    @app.route(app.config['BASE_URL'] + 'search/', methods=['GET', 'POST'])
+    @app.route(app.config['BASE_URL'] + '/search/', methods=['GET', 'POST'])
     def search():
         glob_vars = get_globals()
         session['query_data'] = request.form
@@ -187,7 +186,6 @@ def create_app(test_config=None):
                     "error.html", 
                     title=app.config['TITLE'] + " No results found", 
                     error_text='No results found',
-                    base_url=app.config['BASE_URL']
                 )
             else:
                 for data in cur.fetchall():
@@ -207,13 +205,12 @@ def create_app(test_config=None):
                     title=app.config['TITLE'] + " - Blast search",
                     count=len(results),
                     results=results,
-                    base_url=app.config['BASE_URL']
                 )
         
 #
 # Blast
 #
-    @app.route(app.config['BASE_URL'] + 'blast/')
+    @app.route(app.config['BASE_URL'] + '/blast/')
     def blast():
         results, error = run_blast(app, session['query_seq'])
         if error:
@@ -221,7 +218,6 @@ def create_app(test_config=None):
                 "error.html", 
                 title=app.config['TITLE'] + " No Blast results found", 
                 error_text='No results found',
-                base_url=app.config['BASE_URL']
             )
         else:
             return render_template(
@@ -229,13 +225,12 @@ def create_app(test_config=None):
                 title=app.config['TITLE'] + " - Blast search",
                 count=len(results),
                 results=results,
-                base_url=app.config['BASE_URL']
             )
         
 #   
 # Show Structure
 #
-    @app.route(app.config['BASE_URL'] + 'show/<idCode>')
+    @app.route(app.config['BASE_URL'] + '/show/<idCode>')
     def show(idCode):
         glob_vars = get_globals()
         cur = mysql.connection.cursor()

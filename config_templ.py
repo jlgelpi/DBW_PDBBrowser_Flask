@@ -1,4 +1,4 @@
-BASE_URL = '/'
+BASE_URL = '' # No trailing /
 SECRET_KEY = 'dev'
 MYSQL_HOST = 'localhost'
 MYSQL_USER = 'USER' 

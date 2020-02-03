@@ -16,17 +16,16 @@
             {% for data in results %}
                 <tr>
                     <td>
-                        <a href="{{ base_url }}show/{{data['idCode']}}">{{ data['idCode'] }}_{{ data['sub']}}</a>
+                        <a href="{{ url_for('show', idCode=data['idCode']) }}">{{ data['idCode'] }}_{{ data['sub']}}</a>
                     </td>
-                    <td>{{data['tip']}}</td>	
-                    <td>{{data['desc']}}</td>
-                    <td>{{data['ev']}}</td>
+                    <td>{{ data['tip'] }}</td>	
+                    <td>{{ data['desc'] }}</td>
+                    <td>{{ data['ev'] }}</td>
                 </tr>
             {% endfor %}
         </tbody>
     </table>
-<p class="button"><a href="{{ base_url}}?new=1">New Search</a></p>
-
+<p class="button"><a href="{{url_for('index')}}?new=1">New Search</a></p>
 <script type="text/javascript">
     $(document).ready(function () {
         $('#blastTable').DataTable();
