@@ -132,7 +132,7 @@ def create_app(test_config=None):
 # Index 
 #
 
-    @app.route(app.config['BASE_URL'] + '/')
+    @app.route('/pypdb')
     def index():
         glob_vars = get_globals()
         if 'query_data' not in session:
@@ -153,7 +153,7 @@ def create_app(test_config=None):
 #
 # Search page
 #
-    @app.route(app.config['BASE_URL'] + '/search/', methods=['GET', 'POST'])
+    @app.route('/pypdb/search', methods=['GET', 'POST'])
     def search():
         glob_vars = get_globals()
         session['query_data'] = request.form
@@ -210,7 +210,7 @@ def create_app(test_config=None):
 #
 # Blast
 #
-    @app.route(app.config['BASE_URL'] + '/blast/')
+    @app.route('/pypdb/blast')
     def blast():
         results, error = run_blast(app, session['query_seq'])
         if error:
@@ -230,7 +230,7 @@ def create_app(test_config=None):
 #   
 # Show Structure
 #
-    @app.route(app.config['BASE_URL'] + '/show/<idCode>')
+    @app.route('/pypdb/show/<idCode>')
     def show(idCode):
         glob_vars = get_globals()
         cur = mysql.connection.cursor()
