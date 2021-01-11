@@ -16,7 +16,7 @@
             {% for data in results %}
                 <tr>
                     <td>
-                        <a href="{{ url_for('show', idCode=data['idCode']) }}">{{ data['idCode'] }}_{{ data['sub']}}</a>
+                        <a href="{{ext_url}}{{ url_for('show', idCode=data['idCode']) }}">{{ data['idCode'] }}_{{ data['sub']}}</a>
                     </td>
                     <td>{{ data['tip'] }}</td>	
                     <td>{{ data['desc'] }}</td>
@@ -25,7 +25,7 @@
             {% endfor %}
         </tbody>
     </table>
-<p class="button"><a href="{{url_for('index')}}?new=1">New Search</a></p>
+<p class="button"><a href="{{ext_url}}{{url_for('index')}}?new=1">New Search</a></p>
 <script type="text/javascript">
     $(document).ready(function () {
         $('#blastTable').DataTable();

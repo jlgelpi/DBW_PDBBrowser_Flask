@@ -132,7 +132,7 @@ def create_app(test_config=None):
 # Index 
 #
 
-    @app.route('/pypdb')
+    @app.route('/pypdb/')
     def index():
         glob_vars = get_globals()
         if 'query_data' not in session:
@@ -148,18 +148,19 @@ def create_app(test_config=None):
             'index.html', 
             title=app.config['TITLE'],
             query_data=query_data,
-            globals=glob_vars
+            globals=glob_vars,
+            ext_url=app.config["EXT_URL"]
         )
 #
 # Search page
 #
-    @app.route('/pypdb/search', methods=['GET', 'POST'])
+    @app.route('/pypdb/search/', methods=['GET', 'POST'])
     def search():
         glob_vars = get_globals()
         session['query_data'] = request.form
         if request.form['idCode']:
             #PDB ID 
-            return redirect(url_for('show', idCode=request.form['idCode']))
+            return redirect(app.config["EXT_URL"] + url_for('show', idCode=request.form['idCode']))
         elif request.form['seqQuery'] or request.files['seqFile'].filename:
             if request.files['seqFile'].filename:
                 sequence = request.files['seqFile'].read().decode('ascii')
@@ -173,7 +174,7 @@ def create_app(test_config=None):
                     error_text='No input sequence found'
                 )
             session['query_seq'] = sequence        
-            return redirect(url_for('blast'))
+            return redirect(app.config['EXT_URL'] + url_for('blast'))
         else:
             # Search
             sql = prep_sql(request.form, glob_vars, app.config['TEXT_FIELDS'])
@@ -205,12 +206,13 @@ def create_app(test_config=None):
                     title=app.config['TITLE'] + " - Blast search",
                     count=len(results),
                     results=results,
+                    ext_url = app.config['EXT_URL'],
                 )
         
 #
 # Blast
 #
-    @app.route('/pypdb/blast')
+    @app.route('/pypdb/blast/')
     def blast():
         results, error = run_blast(app, session['query_seq'])
         if error:
@@ -225,6 +227,7 @@ def create_app(test_config=None):
                 title=app.config['TITLE'] + " - Blast search",
                 count=len(results),
                 results=results,
+                ext_url = app.config['EXT_URL'],
             )
         
 #   
@@ -256,7 +259,8 @@ def create_app(test_config=None):
             'show.html',
             title=app.config['TITLE'] + " - " + idCode,
             globals = glob_vars,
-            data=data
+            data=data,
+            ext_url = app.config['EXT_URL'],
         )
     
     return app

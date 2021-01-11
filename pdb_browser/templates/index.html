@@ -2,7 +2,7 @@
 
 {% block content %}
 
-<form name="MainForm" action="{{ url_for("search") }}" method="POST" enctype="multipart/form-data">
+<form name="MainForm" action="{{ext_url}}{{url_for('search')}}" method="POST" enctype="multipart/form-data">
     <div class="row" style="border-bottom: solid 1px">
         <div class="form-group">
             <label><b>PDB Id</b></label>

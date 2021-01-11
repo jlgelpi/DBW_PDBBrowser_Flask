@@ -12,9 +12,9 @@
           <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
           <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
         <![endif]--> 
-        <link rel="stylesheet" href="{{ url_for('static',filename='DataTable/jquery.dataTables.min.css')}}"/>
-        <script type="text/javascript" src="{{ url_for('static',filename='DataTable/jquery-2.2.0.min.js')}}"></script>
-        <script type="text/javascript" src="{{ url_for('static',filename='DataTable/jquery.dataTables.min.js')}}"></script>
+        <link rel="stylesheet" href="{{ext_url}}{{url_for('index')}}{{ url_for('static',filename='DataTable/jquery.dataTables.min.css')}}"/>
+        <script type="text/javascript" src="{{ext_url}}{{url_for('index')}}{{ url_for('static',filename='DataTable/jquery-2.2.0.min.js')}}"></script>
+        <script type="text/javascript" src="{{ext_url}}{{url_for('index')}}{{ url_for('static',filename='DataTable/jquery.dataTables.min.js')}}"></script>
 
     </head>
     <body bgcolor="#ffffff">

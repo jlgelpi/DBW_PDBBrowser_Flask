@@ -17,7 +17,7 @@
     <tbody>
         {% for data in results %}
             <tr>
-                <td><a href="{{ url_for('show', idCode=data['idCode']) }}">{{ data['idCode'] }}</a></td>
+		    <td><a href="{{ext_url}}{{url_for('show', idCode=data['idCode'])}}">{{ data['idCode'] }}</a></td>
                 <td>{{ data['header'] }}</td>
                 <td>{{ data['compound']}}</td>
                 <td>{{ data['resolution']}}</td>
@@ -27,7 +27,7 @@
         {% endfor %}
     </tbody>
 </table>
-<p class="button"><a href="{{ url_for('index') }}?new=1">New Search</a></p>
+<p class="button"><a href="{{ext_url}}{{url_for('index')}}/?new=1">New Search</a></p>
 <script type="text/javascript">
 <!-- this activates the DataTable element when page is loaded-->
     $(document).ready(function () {
