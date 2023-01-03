@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
 {% block content %}
     {{error_text}}
-    <p class="button" ><a href="{{url_for('index')}}?new=1">New Search</a></p>
+    <p class="button" ><a href="{{ext_url}}{{url_for('index')}}?new=1">New Search</a></p>
 {% endblock %}
