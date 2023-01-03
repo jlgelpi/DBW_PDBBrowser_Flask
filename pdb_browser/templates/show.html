@@ -1,15 +1,16 @@
 {% extends 'base.html' %}
 {% block content %}
+
 <table class="table">
     <tbody>
         <tr>
             <td>PDB reference</td>
             <td>{{data['idCode']}}</td>
             <td rowspan="5">
-                   <a href="http://www.pdb.org/pdb/explore.do?structureId={{data['idCode']}}" target="_blank">
-                        <img src="http://mmb.irbbarcelona.org/api/pdb/{{data['idCode'].lower()}}.png" border="0" width="250" ><br>
-                        Link to Protein Data Bank</a>
-                </td>
+                <a href="{{config['PDB_PREFIX']}}{{data['idCode']}}" target="_blank">
+                <img src="{{config['API_PREFIX']}}{{data['idCode'].lower()}}.png" border="0" width="250" ><br>
+                    Link to Protein Data Bank</a>
+            </td>
             </tr>
             <tr>
                 <td>Header</td>
@@ -34,7 +35,7 @@
                 <td>{{ data['ascessionDate'] }}</td>
             </tr>
             <tr>
-                <td>Experiment type</td> 
+                <td>Experiment type</td>
                 <td colspan="2">{{ globals['expTypeArray'][data['idExpType']] }}</td>
             </tr>
             <tr>

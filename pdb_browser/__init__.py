@@ -28,7 +28,7 @@ def run_blast(app, query):
         with open(blast_report_file, 'r') as report:
             for line in report:
                 line = line.rstrip()
-                if len(line) > 1: 
+                if len(line) > 1:
                     id, header, ev = line.split("\t")
                     m = re.match('(....)_(.) mol:([^ ]*) length:([0-9]*) *(.*)', header)
                     results.append (
@@ -46,11 +46,11 @@ def run_blast(app, query):
 
     os.remove(query_fasta_file)
     os.remove(blast_report_file)
-    
+
     return results, False
 
 def prep_sql(form_data, glob_vars, text_fields):
-    ''' Prepare SQL from search form '''    
+    ''' Prepare SQL from search form '''
     ANDconds = ["True"] # required to fulfill SQL syntax if form is empty
     #Resolution, we consider only cases where user has input something
     if form_data['minRes'] != '0.0' or form_data['maxRes'] != 'Inf':
@@ -80,7 +80,7 @@ def prep_sql(form_data, glob_vars, text_fields):
             ORConds.append("MATCH (" + field + ") AGAINST ('" + form_data['query'] + "' IN BOOLEAN MODE)")
             #ORConds.append("MATCH (" + field + ") AGAINST ('" + form_data['query'] + ")")
         ANDconds.append("(" + " OR ".join(ORConds) +  ")")
-    
+
     #  main SQL string, make sure that all tables are joint, and relationships included
 
     sql = "SELECT distinct e.idCode,e.header,e.compound,e.resolution,s.source,et.expType FROM " +\
@@ -91,7 +91,7 @@ def prep_sql(form_data, glob_vars, text_fields):
             "e.idCode = sq.idCode AND " + " AND ".join(ANDconds)
     if 'nolimit' not in form_data:
         sql += " LIMIT 5000" # Just to avoid too long listings when testing
-    
+
     return sql
 
 #===============================================================================
@@ -107,7 +107,7 @@ def create_app(test_config=None):
         sys.exit(e)
     app.config.from_pyfile('config.py', silent=False)
     mysql = MySQL(app)
-   
+
 #
 # Global data
 #
@@ -118,21 +118,21 @@ def create_app(test_config=None):
         cur.execute("SELECT * from comptype")
         for key, value in cur.fetchall():
             globals['compTypeArray'][key] = value
-        globals['expClasseArray'] = {}        
+        globals['expClasseArray'] = {}
         cur.execute("SELECT * from expClasse")
         for key, value in cur.fetchall():
             globals['expClasseArray'][key] = value
-        globals['expTypeArray'] = {}        
+        globals['expTypeArray'] = {}
         cur.execute("SELECT idExptype, ExpType from expType")
         for key, value in cur.fetchall():
             globals['expTypeArray'][key] = value
         return globals
 
 #
-# Index 
+# Index
 #
 
-    @app.route('/pypdb/')
+    @app.route('/')
     def index():
         glob_vars = get_globals()
         if 'query_data' not in session:
@@ -140,41 +140,41 @@ def create_app(test_config=None):
                 'minRes' : '0.0',
                 'maxRes' : 'Inf',
                 'query' : ''
-            } 
+            }
         else:
             query_data = session['query_data']
-            
+
         return render_template(
-            'index.html', 
+            'index.html',
             title=app.config['TITLE'],
             query_data=query_data,
             globals=glob_vars,
-            ext_url=app.config["EXT_URL"]
+            ext_url=app.config["BASE_URL"]
         )
 #
 # Search page
 #
-    @app.route('/pypdb/search/', methods=['GET', 'POST'])
+    @app.route('/search/', methods=['GET', 'POST'])
     def search():
         glob_vars = get_globals()
         session['query_data'] = request.form
         if request.form['idCode']:
-            #PDB ID 
-            return redirect(app.config["EXT_URL"] + url_for('show', idCode=request.form['idCode']))
+            #PDB ID
+            return redirect(app.config["BASE_URL"] + url_for('show', idCode=request.form['idCode']))
         elif request.form['seqQuery'] or request.files['seqFile'].filename:
             if request.files['seqFile'].filename:
                 sequence = request.files['seqFile'].read().decode('ascii')
             else:
                 sequence = request.form['seqQuery']
             # Blast
-            if not sequence: 
+            if not sequence:
                 return render_template(
-                    "error.html", 
-                    title=app.config['TITLE'] + " No input sequence found", 
+                    "error.html",
+                    title=app.config['TITLE'] + " No input sequence found",
                     error_text='No input sequence found'
                 )
-            session['query_seq'] = sequence        
-            return redirect(app.config['EXT_URL'] + url_for('blast'))
+            session['query_seq'] = sequence
+            return redirect(app.config['BASE_URL'] + url_for('blast'))
         else:
             # Search
             sql = prep_sql(request.form, glob_vars, app.config['TEXT_FIELDS'])
@@ -184,8 +184,8 @@ def create_app(test_config=None):
             rs = cur.execute(sql)
             if not rs:
                 return render_template(
-                    "error.html", 
-                    title=app.config['TITLE'] + " No results found", 
+                    "error.html",
+                    title=app.config['TITLE'] + " No results found",
                     error_text='No results found',
                 )
             else:
@@ -200,25 +200,25 @@ def create_app(test_config=None):
                             'expType' : data[5]
                         }
                     )
-                    
+
                 return render_template(
                     'search_output.html',
-                    title=app.config['TITLE'] + " - Blast search",
+                    title=app.config['TITLE'] + " - Database search",
                     count=len(results),
                     results=results,
-                    ext_url = app.config['EXT_URL'],
+                    ext_url = app.config['BASE_URL'],
                 )
-        
+
 #
 # Blast
 #
-    @app.route('/pypdb/blast/')
+    @app.route('/blast/')
     def blast():
         results, error = run_blast(app, session['query_seq'])
         if error:
             return render_template(
-                "error.html", 
-                title=app.config['TITLE'] + " No Blast results found", 
+                "error.html",
+                title=app.config['TITLE'] + " No Blast results found",
                 error_text='No results found',
             )
         else:
@@ -227,21 +227,21 @@ def create_app(test_config=None):
                 title=app.config['TITLE'] + " - Blast search",
                 count=len(results),
                 results=results,
-                ext_url = app.config['EXT_URL'],
+                ext_url = app.config['BASE_URL'],
             )
-        
-#   
+
+#
 # Show Structure
 #
-    @app.route('/pypdb/show/<idCode>')
+    @app.route('/show/<idCode>')
     def show(idCode):
         glob_vars = get_globals()
         cur = mysql.connection.cursor()
         rs = cur.execute("SELECT e.* from entry e where e.idCode='{}'".format(idCode))
         if not rs:
             return render_template(
-                "error.html", 
-                title=app.config['TITLE'], 
+                "error.html",
+                title=app.config['TITLE'],
                 error_text='Structure not found ({})'.format(idCode)
             )
         columns = [col[0] for col in cur.description]
@@ -260,9 +260,9 @@ def create_app(test_config=None):
             title=app.config['TITLE'] + " - " + idCode,
             globals = glob_vars,
             data=data,
-            ext_url = app.config['EXT_URL'],
+            ext_url = app.config['BASE_URL'],
         )
-    
+
     return app
 
-  
+
