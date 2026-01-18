@@ -5,7 +5,8 @@ import uuid
 import subprocess
 
 from flask import Flask, render_template, session, request, url_for, redirect
-from flask_mysqldb import MySQL
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import text
 
 def prep_fasta(seq, header):
     return ">{}\n{}".format(header, re.sub('.{60}','\g<0>\n',seq))
@@ -60,14 +61,14 @@ def prep_sql(form_data, glob_vars, text_fields):
             ANDconds.append("e.resolution <= " + form_data['maxRes'])
     # Compound type ORconds holds options selected
     ORConds = []
-    for key, value in glob_vars['compTypeArray'].items():
+    for key, value in glob_vars['compTypesArray'].items():
         if 'idCompType['+ str(key) +']' in form_data:
             ORConds.append(" e.idCompType = " + str(key));
     if ORConds:
         ANDconds.append('(' + ' OR '.join(ORConds) + ')')
     # Classe of experiment
     ORConds = []
-    for key, value in glob_vars['expClasseArray'].items():
+    for key, value in glob_vars['expClassesArray'].items():
         if 'idExpClasse[' + str(key) + ']' in form_data:
             ORConds.append(' et.idExpClasse = ' + str(key))
     if ORConds:
@@ -84,7 +85,7 @@ def prep_sql(form_data, glob_vars, text_fields):
     #  main SQL string, make sure that all tables are joint, and relationships included
 
     sql = "SELECT distinct e.idCode,e.header,e.compound,e.resolution,s.source,et.expType FROM " +\
-            "expType et, author_has_entry ae, author a, source s, entry_has_source es, entry e, sequence sq WHERE " +\
+            "expTypes et, author_has_entry ae, authors a, sources s, entry_has_source es, entries e, sequences sq WHERE " +\
             "e.idExpType=et.idExpType AND " +\
             "ae.idCode=e.idCode and ae.idAuthor=a.idAuthor AND " +\
             "es.idCode=e.idCode and es.idsource=s.idSource AND " +\
@@ -106,26 +107,25 @@ def create_app(test_config=None):
     except OSError as e:
         sys.exit(e)
     app.config.from_pyfile('config.py', silent=False)
-    mysql = MySQL(app)
+    db = SQLAlchemy(app)
 
 #
 # Global data
 #
     def get_globals():
         globals = {}
-        globals['compTypeArray'] = {}
-        cur = mysql.connection.cursor()
-        cur.execute("SELECT * from comptype")
-        for key, value in cur.fetchall():
-            globals['compTypeArray'][key] = value
-        globals['expClasseArray'] = {}
-        cur.execute("SELECT * from expClasse")
-        for key, value in cur.fetchall():
-            globals['expClasseArray'][key] = value
-        globals['expTypeArray'] = {}
-        cur.execute("SELECT idExptype, ExpType from expType")
-        for key, value in cur.fetchall():
-            globals['expTypeArray'][key] = value
+        globals['compTypesArray'] = {}
+        result = db.session.execute(text("SELECT * FROM compTypes"))
+        for row in result:
+            globals['compTypesArray'][row[0]] = row[1]
+        globals['expClassesArray'] = {}
+        result = db.session.execute(text("SELECT * FROM expClasses"))
+        for row in result:
+            globals['expClassesArray'][row[0]] = row[1]
+        globals['expTypesArray'] = {}
+        result = db.session.execute(text("SELECT idExptype, ExpType FROM expTypes"))
+        for row in result:
+            globals['expTypesArray'][row[0]] = row[1]
         return globals
 
 #
@@ -180,16 +180,16 @@ def create_app(test_config=None):
             sql = prep_sql(request.form, glob_vars, app.config['TEXT_FIELDS'])
             #print(sql)
             results = []
-            cur = mysql.connection.cursor()
-            rs = cur.execute(sql)
-            if not rs:
+            result = db.session.execute(text(sql))
+            rows = result.fetchall()
+            if not rows:
                 return render_template(
                     "error.html",
                     title=app.config['TITLE'] + " No results found",
                     error_text='No results found',
                 )
             else:
-                for data in cur.fetchall():
+                for data in rows:
                     results.append(
                         {
                             'idCode' : data[0],
@@ -236,23 +236,32 @@ def create_app(test_config=None):
     @app.route('/show/<idCode>')
     def show(idCode):
         glob_vars = get_globals()
-        cur = mysql.connection.cursor()
-        rs = cur.execute("SELECT e.* from entry e where e.idCode='{}'".format(idCode))
-        if not rs:
+        result = db.session.execute(text("SELECT e.* FROM entries e WHERE e.idCode = :id"), {"id": idCode})
+        row = result.fetchone()
+        if not row:
             return render_template(
                 "error.html",
                 title=app.config['TITLE'],
                 error_text='Structure not found ({})'.format(idCode)
             )
-        columns = [col[0] for col in cur.description]
-        data = dict(zip(columns, cur.fetchone()))
-        rs = cur.execute("SELECT a.author from author a, author_has_entry ae where ae.idCode='{}' and a.idAuthor = ae.idAuthor order by a.author".format(idCode))
-        data['author_list'] = ', '.join([aut[0] for aut in cur.fetchall()])
-        rs = cur.execute("SELECT s.source from source s, entry_has_source es where es.idCode='{}' and s.idSource = es.idSource order by s.source".format(idCode))
-        data['source_list'] = ', '.join([sc[0] for sc in cur.fetchall()])
-        rs = cur.execute("SELECT * from sequence s where s.idCode='{}' order by s.chain".format(idCode))
+        columns = list(result.keys())
+        data = dict(zip(columns, row))
+        result = db.session.execute(
+            text("SELECT a.author FROM authors a, author_has_entry ae WHERE ae.idCode = :id AND a.idAuthor = ae.idAuthor ORDER BY a.author"),
+            {"id": idCode}
+        )
+        data['author_list'] = ', '.join([aut[0] for aut in result.fetchall()])
+        result = db.session.execute(
+            text("SELECT s.source FROM sources s, entry_has_source es WHERE es.idCode = :id AND s.idSource = es.idSource ORDER BY s.source"),
+            {"id": idCode}
+        )
+        data['source_list'] = ', '.join([sc[0] for sc in result.fetchall()])
+        result = db.session.execute(
+            text("SELECT * FROM sequences s WHERE s.idCode = :id ORDER BY s.chain"),
+            {"id": idCode}
+        )
         data['sequences'] = []
-        for sq in cur.fetchall():
+        for sq in result.fetchall():
             data['sequences'].append(prep_fasta(sq[2], sq[3]))
 
         return render_template(
@@ -264,5 +273,3 @@ def create_app(test_config=None):
         )
 
     return app
-
-
