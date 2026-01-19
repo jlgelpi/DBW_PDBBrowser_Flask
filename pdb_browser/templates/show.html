@@ -8,7 +8,7 @@
             <td>{{data['idCode']}}</td>
             <td rowspan="5">
                 <a href="{{config['PDB_PREFIX']}}{{data['idCode']}}" target="_blank">
-                <img src="{{config['API_PREFIX']}}{{data['idCode'].lower()}}.png" border="0" width="250" ><br>
+                <img src="https://cdn.rcsb.org/images/structures/{{data['idCode'].lower()}}_assembly-1.jpeg" border="0" width="250" ><br>
                     Link to Protein Data Bank</a>
             </td>
             </tr>
@@ -36,7 +36,7 @@
             </tr>
             <tr>
                 <td>Experiment type</td>
-                <td colspan="2">{{ globals['expTypeArray'][data['idExpType']] }}</td>
+                <td colspan="2">{{ globals['expTypesArray'][data['idExpType']] }}</td>
             </tr>
             <tr>
                 <td>Authors</td>
